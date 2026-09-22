@@ -1,4 +1,6 @@
-# Job Seeker Back-End
+# Backend Gagal Deploy
+
+# Job Portal Back-End
 
 API RESTful untuk platform pencarian kerja.
 
@@ -23,22 +25,24 @@ API RESTful untuk platform pencarian kerja.
 ## API Endpoints
 
 ### Auth
+
 - `POST /api/user/auth/register`
 - `POST /api/user/auth/login`
 - `POST /api/company/auth/register`
 - `POST /api/company/auth/login`
 
 ### Profile
+
 - `POST /api/user/profile`
 - `PATCH /api/user/profile`
 - `POST /api/company/profile`
 - `PATCH /api/company/profile`
 
 ### Jobs
+
 - `GET /job`
 - `POST /api/company/job`
 - `POST /job/:jobId/apply`
-
 
 1. `npm install`
 2. Konfigurasi `DATABASE_URL` di `.env`
