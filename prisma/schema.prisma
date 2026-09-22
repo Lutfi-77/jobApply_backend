@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ApplicationStatus {
+  Applied
+  Reviewing
+  Shortlisted
+  Rejected
+  Accepted
+}
+
+model User {
+  id        String   @id @default(uuid())
+  fullName  String   @map("full_name")
+  email     String   @unique @db.VarChar(100)
+  password  String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile      Profile?
+  applications Application[]
+
+  @@map("users")
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  address   String
+  skills    String[]
+  userId    String   @unique @map("id_user")
+  bio       String?  @db.Text
+  cv        String?  @db.VarChar(255)
+  portfolio String?  @db.VarChar(255)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+model CompanyAccount {
+  id          String @id @default(uuid())
+  companyName String @db.VarChar(150)
+  email       String @unique
+  password    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs            Job[]
+  companyProfiles CompanyProfile?
+
+  @@map("company_accounts")
+}
+
+model CompanyProfile {
+  id        String  @id @default(uuid())
+  companyId String  @unique
+  address   String  @db.VarChar(255)
+  logo      String? @db.VarChar(255)
+  bio       String
+
+  company   CompanyAccount @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("company_profiles")
+}
+
+model Job {
+  id          String  @id @default(uuid())
+  companyId   String
+  title       String  @db.VarChar(150)
+  description String  @db.Text
+  salary      String? @db.VarChar(100)
+  type        String  @db.VarChar(20)
+  location    String
+
+  company CompanyAccount @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("jobs")
+}
+
+model Application {
+  id     String @id @default(uuid())
+  userId String
+  jobId  String
+
+  status ApplicationStatus @default(Applied)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, jobId])
+  @@map("applications")
+}
